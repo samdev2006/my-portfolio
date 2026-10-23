@@ -54,7 +54,7 @@ export const profile = {
   // Placez l'archive dans public/ si vous souhaitez la proposer en téléchargement.
   sourceCode: {
     zipPath: "", // ex. '/portfolio-samuel-fullstack.zip' (laisser vide pour masquer le bouton)
-    repoUrl: "", // ex. 'https://github.com/votre-pseudo/portfolio'
+    repoUrl: "https://github.com/samdev2006/my-portfolio", // ex. 'https://github.com/votre-pseudo/portfolio'
   },
 
   availability: {
