@@ -1,0 +1,20 @@
+VOS CRÉATIONS (affiches, vidéos, retouches photo)
+==================================================
+
+Déposez ici vos fichiers :
+  - Affiches / photos : .webp, .jpg ou .png (idéalement moins de 400 Ko, 1600 px de large maximum)
+  - Vidéos            : .mp4 (H.264) — ou utilisez un identifiant YouTube
+  - Retouche photo    : une image « avant » et une image « après » pour le comparateur
+
+Puis déclarez-les dans src/data/creations.js (le mode d'emploi est en tête du fichier).
+
+Exemple :
+  {
+    id: 'affiche-concert',
+    category: 'affiches',
+    title: 'Affiche du concert de Noël',
+    description: 'Affiche A3 réalisée pour …',
+    type: 'image',
+    src: '/creations/affiche-concert.webp',
+    ratio: 'portrait',
+  }

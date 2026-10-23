@@ -1,0 +1,19 @@
+IMAGES DES PROJETS
+==================
+
+Déposez ici les captures d'écran de vos projets (format .webp, .png ou .jpg,
+idéalement 1280 x 800 px et moins de 300 Ko chacune).
+
+Référencez-les ensuite dans src/data/projects.js, par exemple :
+
+    image: { src: '/images/mon-projet.webp', alt: 'Capture de l\'écran d\'accueil de Mon Projet' }
+
+Tant qu'aucune image n'est renseignée, une illustration spatiale
+marquée « Visuel provisoire » est affichée à la place.
+
+IMAGE DE PARTAGE (og-cover)
+---------------------------
+og-cover.svg est fourni comme visuel par défaut. Les réseaux sociaux
+(LinkedIn, WhatsApp, X…) préfèrent un PNG ou un JPG de 1200 x 630 px :
+exportez-le, déposez-le ici (ex. og-cover.png) puis mettez à jour les
+balises og:image et twitter:image dans index.html.

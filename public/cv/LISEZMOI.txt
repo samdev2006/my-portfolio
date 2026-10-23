@@ -1,0 +1,15 @@
+EMPLACEMENT DU CV
+=================
+
+Déposez ici votre CV au format PDF, avec exactement ce nom :
+
+    cv-samuel.pdf
+
+Le bouton « Télécharger mon CV » devient alors actif automatiquement.
+Le fichier téléchargé portera le nom défini dans src/data/profile.js
+(champ cv.downloadName).
+
+Aucun faux CV n'est fourni : tant que le fichier est absent, le bouton
+indique que le CV sera bientôt disponible.
+
+Pour utiliser un autre nom de fichier, modifiez cv.path dans src/data/profile.js.

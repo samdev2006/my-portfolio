@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="jup" cx="32%" cy="28%" r="80%">
+      <stop offset="0" stop-color="#f3f5f7"/>
+      <stop offset="0.5" stop-color="#a9aeb6"/>
+      <stop offset="1" stop-color="#4a4f57"/>
+    </radialGradient>
+    <radialGradient id="sun" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#ffb347"/>
+      <stop offset="0.55" stop-color="#ff6b1a"/>
+      <stop offset="1" stop-color="#c23a00"/>
+    </radialGradient>
+    <radialGradient id="teal" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#3be0e0"/>
+      <stop offset="0.6" stop-color="#0e8fa3"/>
+      <stop offset="1" stop-color="#0a5568"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#080A0D"/>
+  <path d="M0 380 C200 300 380 440 600 380 C820 320 980 200 1200 250 L1200 630 L0 630Z" fill="#101419"/>
+  <path d="M0 500 C240 430 420 540 660 480 C880 425 1020 340 1200 390 L1200 630 L0 630Z" fill="#0c1014"/>
+  <ellipse cx="850" cy="300" rx="330" ry="120" fill="none" stroke="#4D8DFF" stroke-width="2" opacity="0.45" transform="rotate(-18 850 300)"/>
+  <circle cx="850" cy="300" r="190" fill="url(#jup)"/>
+  <path d="M690 250 Q850 215 1010 270" stroke="#f0b73a" stroke-width="16" fill="none" opacity="0.9"/>
+  <circle cx="1090" cy="470" r="46" fill="url(#sun)"/>
+  <circle cx="640" cy="520" r="62" fill="url(#teal)"/>
+  <circle cx="1120" cy="120" r="9" fill="#D8DDE3"/>
+  <circle cx="560" cy="140" r="6" fill="#D8DDE3" opacity="0.8"/>
+  <g fill="#F5F7FA" opacity="0.7">
+    <circle cx="120" cy="90" r="2"/><circle cx="300" cy="60" r="1.5"/><circle cx="420" cy="170" r="2"/>
+    <circle cx="980" cy="560" r="2"/><circle cx="740" cy="70" r="1.5"/><circle cx="200" cy="260" r="1.5"/>
+  </g>
+  <text x="70" y="270" fill="#F5F7FA" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="700" letter-spacing="2">ADOUKO SAMUEL</text>
+  <text x="72" y="335" fill="#FF6B1A" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="600" letter-spacing="6">FULL-STACK DEVELOPER</text>
+  <text x="72" y="395" fill="#D8DDE3" font-family="Arial, Helvetica, sans-serif" font-size="26">Applications web et mobiles · API REST</text>
+</svg>
