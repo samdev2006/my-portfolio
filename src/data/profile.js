@@ -31,7 +31,7 @@ export const profile = {
     location: "Abidjan,Côte d'\Ivoire",
     // Service de formulaire (ex. Formspree : 'https://formspree.io/f/xxxxxxx').
     // Vide = le formulaire ouvre le client de messagerie via mailto:.
-    formEndpoint: "",
+    formEndpoint: "https://formspree.io/f/xqppkzdv",
   },
 
   // Réseaux : laissez '' tant que l'URL n'est pas connue.
