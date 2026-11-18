@@ -1,73 +1,65 @@
-// Projets du portfolio. Modifiez ce fichier pour ajouter ou changer un projet.
+// Projets du portfolio, dans l'ordre d'affichage.
 //
 // Champs :
-//  - id, name, tagline, description, problem
-//  - features : liste de fonctionnalités (à ajuster selon ce qui est réellement implémenté)
-//  - tech : technologies (à ajuster selon l'implémentation réelle)
-//  - repoUrl : lien vers le code source ('' = lien désactivé)
-//  - demoUrl : lien vers la démo ('' = lien désactivé)
-//  - image : { src, alt } pour une vraie capture (sinon visuel provisoire généré)
-//  - planet : 'sun' | 'teal' | 'ringed' | 'blue' (illustration provisoire)
-//  - placeholder : true tant que le projet n'est pas finalisé / renseigné
+//  - id, name, tagline, description, problem (facultatif)
+//  - status   : 'En ligne' | 'En cours' | '' (badge affiché à côté du nom)
+//  - features : fonctionnalités réellement implémentées
+//  - tech     : technologies utilisées
+//  - repoUrl  : lien vers le code ('' = bouton masqué). Le dépôt doit être PUBLIC sinon GitHub affiche une 404.
+//  - demoUrl  : lien vers la version en ligne ('' = bouton masqué)
+//  - image    : { src, alt } capture d'écran (idéalement .webp, 1600 px de large) ou null
+//  - accent   : couleur de la couverture générée quand il n'y a pas d'image
 
 export const projects = [
   {
+    id: 'finansmart',
+    name: 'FinanSmart',
+    tagline: 'Gestion financière pour les PME',
+    status: 'En cours',
+    description:
+      'Application web de gestion financière pensée pour les PME ivoiriennes : enregistrement des opérations, gestion des accès par rôle et génération du rapport financier de l’entreprise.',
+    problem: 'Centraliser l’information financière d’une PME au lieu de la disperser entre carnets et tableurs.',
+    features: [
+      'Enregistrement des opérations financières',
+      'Accès par rôle : administrateur et gestionnaire',
+      'Ajout de gestionnaires par l’administrateur',
+      'Génération du rapport financier',
+    ],
+    tech: ['React', 'Spring Boot', 'MySQL'],
+    repoUrl: 'https://github.com/samdev2006/finansmart-fontend',
+    demoUrl: '',
+    image: { src: '/images/finansmart-frontend.webp', alt: 'Écran de connexion de FinanSmart' },
+    accent: '#1BA58F',
+  },
+  {
+    id: 'club-tech-iipea',
+    name: 'Club Tech IIPEA',
+    tagline: 'Site vitrine du club informatique',
+    status: 'En ligne',
+    description:
+      'Site vitrine du club informatique AE-IIPEA, qui rassemble les étudiants passionnés de technologie : présentation du club, activités, événements, équipe et inscription en ligne.',
+    problem: 'Donner au club une présence en ligne claire pour présenter ses activités et recruter de nouveaux membres.',
+    features: ['Présentation du club et de ses activités', 'Agenda des événements', 'Page équipe', 'Formulaire d’inscription'],
+    tech: ['React', 'Vite'],
+    repoUrl: 'https://github.com/samdev2006/tech-iipea-club',
+    demoUrl: 'https://tech-iipea-club.vercel.app',
+    image: { src: '/images/club-informatique.webp', alt: 'Page d’accueil du site du Club Tech IIPEA' },
+    accent: '#2F5BEA',
+  },
+  {
     id: 'myeebdevent',
     name: 'MyEEBDevent',
-    tagline: 'Gestion d’événements pour une communauté religieuse',
+    tagline: 'Gestion d’événements pour une communauté',
+    status: 'En cours',
     description:
-      'Application de gestion d’événements destinée à une communauté religieuse : elle permet de consulter les événements, de s’y inscrire et de retrouver son historique de participation.(en cours de développement)',
+      'Application de gestion d’événements pour une communauté religieuse : les membres consultent les événements, s’y inscrivent et retrouvent l’historique de leurs participations.',
     problem:
-      'Centraliser l’information sur les événements d’une communauté et simplifier l’inscription des membres, au lieu de passer par des messages dispersés.',
-    features: [
-      'Consultation des événements',
-      'Inscription aux événements',
-      'Consultation de l’historique des participations',
-      'Gestion des événements (selon les fonctionnalités réellement implémentées)',
-    ],
-    tech: ['React', 'Spring boot','MySQL'], // à confirmer selon la version du projet exposée
+      'Centraliser l’information sur les événements et simplifier l’inscription des membres, au lieu de passer par des messages dispersés.',
+    features: ['Consultation des événements', 'Inscription aux événements', 'Historique des participations'],
+    tech: ['React', 'Spring Boot', 'MySQL'],
     repoUrl: 'https://github.com/samdev2006/MyEEBDevent',
     demoUrl: '',
     image: null,
-    planet: 'sun',
-    placeholder: false,
-    visualIsPlaceholder: true,
-  },
-  {
-    id: 'finansmart',
-    name: '',
-    tagline: 'Gestion Financière pour PME',
-    description:
-      'Application de gestion financière pour PME',
-    problem:
-      "Centraliser l’information financère d'une PME",
-    features: [
-    "Enregistrement d'une opération",
-      "Ajout d'un gestionnaire étant ADMIN",
-      'Génération du rapport financier de la PME',
-    ],
-    tech: ['React', 'Spring boot','MySQL'],
-    repoUrl: 'https://github.com/samdev2006/finansmart-fontend',
-    demoUrl: '',
-    image: { src: '/images/finansmart-frontend.png', alt: 'Capture de l\'écran d\'accueil de Mon Projet' },
-    planet: 'sun',
-    placeholder: false,
-    visualIsPlaceholder: true,
-  },
-  {
-    id: 'club informatiqueiipea',
-    name: 'Site Internet du club Informatique IIPEA',
-    tagline: 'Site Vitrine',
-    description:
-      '',
-    problem: '',
-    features: [''],
-    tech: [],
-    repoUrl: 'https://github.com/samdev2006/tech-iipea-club',
-    demoUrl: 'https://tech-iipea-club.vercel.app',
-    image: { src: '/images/club-informatique.png', alt: 'Capture de l\'écran d\'accueil de Mon Projet' },
-    planet: 'teal',
-    placeholder: true,
-    visualIsPlaceholder: true,
+    accent: '#FF6B1A',
   },
 ];

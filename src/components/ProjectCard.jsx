@@ -1,90 +1,131 @@
-import { Github, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { ArrowUpRight, Github } from 'lucide-react';
 import Button from './Button.jsx';
-import ProjectVisual from './ProjectVisual.jsx';
 
-/** Grande carte de projet. `reversed` inverse la disposition sur grand écran (asymétrie). */
-export default function ProjectCard({ project, index, reversed = false }) {
-  const { name, tagline, description, problem, features, tech, repoUrl, demoUrl, placeholder } = project;
+function hostOf(url) {
+  try {
+    return new URL(url).host;
+  } catch {
+    return '';
+  }
+}
 
-  // Lumière qui suit le curseur : variables CSS lues par .spotlight::before.
-  const onPointerMove = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    event.currentTarget.style.setProperty('--mx', `${event.clientX - rect.left}px`);
-    event.currentTarget.style.setProperty('--my', `${event.clientY - rect.top}px`);
-  };
+/** Visuel du projet dans un cadre de navigateur. Sans capture : couverture typographique. */
+function ProjectVisual({ project }) {
+  const address = hostOf(project.demoUrl) || `${project.id}.app`;
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-line bg-graphite shadow-[0_30px_80px_-30px_rgba(0,0,0,0.8)]">
+      <div className="flex items-center gap-3 border-b border-line px-4 py-3">
+        <span className="flex gap-1.5" aria-hidden="true">
+          <span className="h-2 w-2 rounded-full bg-paper/20" />
+          <span className="h-2 w-2 rounded-full bg-paper/20" />
+          <span className="h-2 w-2 rounded-full bg-paper/20" />
+        </span>
+        <span className="mx-auto truncate rounded-md bg-ink/60 px-3 py-1 font-mono text-[0.68rem] text-stone">{address}</span>
+        <span className="w-[34px]" aria-hidden="true" />
+      </div>
+      <div className="relative aspect-[16/10] overflow-hidden">
+        {project.image ? (
+          <img
+            src={project.image.src}
+            alt={project.image.alt}
+            loading="lazy"
+            className="h-full w-full object-cover object-top transition-transform duration-[1.2s] ease-out group-hover:scale-[1.03]"
+          />
+        ) : (
+          <div
+            className="flex h-full w-full flex-col justify-between p-8 sm:p-10"
+            style={{
+              background: `radial-gradient(120% 90% at 100% 0%, ${project.accent}55, transparent 60%), radial-gradient(80% 80% at 0% 100%, ${project.accent}22, transparent 60%), #141416`,
+            }}
+          >
+            <span className="label">{project.tagline}</span>
+            <span className="font-display text-5xl font-semibold tracking-[-0.04em] text-paper sm:text-6xl">
+              {project.name}
+            </span>
+            <span className="font-mono text-[0.7rem] uppercase tracking-[0.18em] text-paper/50">Capture bientôt disponible</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function ProjectCard({ project, index }) {
+  const reversed = index % 2 === 1;
 
   return (
     <article
-      data-project
-      onPointerMove={onPointerMove}
-      className={`group glass spotlight grid gap-6 rounded-[2rem] p-4 sm:p-6 lg:grid-cols-2 lg:gap-10 lg:p-8 ${
-        placeholder ? 'border-dashed' : ''
-      }`}
+      aria-labelledby={`projet-${project.id}`}
+      className="group grid grid-cols-1 items-center gap-10 border-t border-line pt-12 lg:grid-cols-12 lg:gap-14 lg:pt-16"
     >
-      <div className={`${reversed ? 'lg:order-2' : ''}`}>
+      <div data-reveal className={`min-w-0 lg:col-span-7 ${reversed ? 'lg:order-2' : ''}`}>
         <ProjectVisual project={project} />
       </div>
 
-      <div className="flex flex-col justify-center py-2">
+      <div data-reveal className={`min-w-0 lg:col-span-5 ${reversed ? 'lg:order-1' : ''}`}>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-xs text-sun">Planète 0{index + 1}</span>
-          {placeholder && (
-            <span className="rounded-full border border-mist/20 px-2.5 py-0.5 font-mono text-[0.6rem] uppercase tracking-[0.18em] text-mist/60">
-              Emplacement libre
+          <span className="font-mono text-sm text-accent">{String(index + 1).padStart(2, '0')}</span>
+          {project.status && (
+            <span className="chip">
+              <span
+                className={`mr-2 h-1.5 w-1.5 rounded-full ${project.status === 'En ligne' ? 'bg-[#28C840]' : 'bg-[#FEBC2E]'}`}
+                aria-hidden="true"
+              />
+              {project.status}
             </span>
           )}
         </div>
 
-        <h3 className="mt-3 text-2xl font-bold leading-tight sm:text-3xl">{name}</h3>
-        <p className="mt-1 text-sm font-medium text-ion">{tagline}</p>
-        <p className="mt-4 text-sm leading-relaxed text-mist/85 sm:text-base">{description}</p>
+        <h3 id={`projet-${project.id}`} className="mt-5 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+          {project.name}
+        </h3>
+        <p className="mt-2 font-display text-lg text-paper/70">{project.tagline}</p>
 
-        <div className="mt-5 rounded-2xl border border-mist/10 bg-void/40 p-4">
-          <p className="font-mono text-[0.65rem] uppercase tracking-[0.25em] text-sun">Problème résolu</p>
-          <p className="mt-2 text-sm leading-relaxed text-mist/85">{problem}</p>
-        </div>
+        <p className="mt-6 leading-relaxed text-stone">{project.description}</p>
 
-        <ul className="mt-5 space-y-2">
-          {features.map((feature) => (
-            <li key={feature} className="flex items-start gap-2.5 text-sm text-mist/85">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-ion" aria-hidden="true" />
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
+        {project.problem && (
+          <p className="mt-5 border-l-2 border-accent/60 pl-4 text-sm leading-relaxed text-paper/80">
+            <span className="label mb-1 block text-accent">Problème résolu</span>
+            {project.problem}
+          </p>
+        )}
 
-        {tech.length > 0 && (
-          <ul aria-label="Technologies utilisées" className="mt-5 flex flex-wrap gap-2">
-            {tech.map((item) => (
-              <li key={item} className="rounded-full border border-volt/30 bg-volt/10 px-3 py-1 font-mono text-xs text-snow">
-                {item}
+        {project.features.length > 0 && (
+          <ul className="mt-6 grid gap-2 text-sm text-paper/85">
+            {project.features.map((feature) => (
+              <li key={feature} className="flex gap-3">
+                <span className="mt-[0.55rem] h-1 w-3 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+                {feature}
               </li>
             ))}
           </ul>
         )}
 
-        <div className="mt-7 flex flex-wrap gap-3">
-          <Button
-            href={repoUrl || undefined}
-            external
-            icon={Github}
-            variant="outline"
-            disabled={!repoUrl}
-            disabledReason="Lien du code source bientôt disponible"
-          >
-            Code source
-          </Button>
-          <Button
-            href={demoUrl || undefined}
-            external
-            icon={ExternalLink}
-            variant="ghost"
-            disabled={!demoUrl}
-            disabledReason="Démonstration non disponible pour le moment"
-          >
-            Démonstration
-          </Button>
-        </div>
+        {project.tech.length > 0 && (
+          <ul aria-label="Technologies" className="mt-7 flex flex-wrap gap-2">
+            {project.tech.map((tech) => (
+              <li key={tech} className="chip">
+                {tech}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {(project.demoUrl || project.repoUrl) && (
+          <div className="mt-8 flex flex-wrap gap-3">
+            {project.demoUrl && (
+              <Button href={project.demoUrl} iconRight={ArrowUpRight} variant="light" size="sm">
+                Voir le site
+              </Button>
+            )}
+            {project.repoUrl && (
+              <Button href={project.repoUrl} icon={Github} variant="outline" size="sm">
+                Code source
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </article>
   );

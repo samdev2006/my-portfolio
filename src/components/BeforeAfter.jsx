@@ -1,22 +1,19 @@
 import { useState } from 'react';
 
-/** Comparateur avant / après pour les retouches photo (curseur accessible au clavier). */
+/** Comparateur avant / après pour les retouches photo (curseur utilisable au clavier). */
 export default function BeforeAfter({ before, after, alt }) {
   const [position, setPosition] = useState(50);
+  const tag = 'pointer-events-none absolute top-3 rounded-full bg-ink/80 px-3 py-1 font-mono text-[0.65rem] uppercase tracking-widest text-paper';
 
   return (
-    <div className="relative select-none overflow-hidden rounded-2xl bg-black">
-      <img src={after} alt={`${alt} — après retouche`} className="block max-h-[70vh] w-full object-contain" />
+    <div className="relative max-w-5xl select-none overflow-hidden rounded-2xl bg-black">
+      <img src={after} alt={`${alt} — après retouche`} className="block max-h-[72vh] w-full object-contain" />
       <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}>
         <img src={before} alt={`${alt} — avant retouche`} className="h-full w-full object-contain" />
       </div>
-      <div className="pointer-events-none absolute inset-y-0 w-0.5 bg-snow shadow-[0_0_12px_rgba(0,0,0,0.6)]" style={{ left: `${position}%` }} />
-      <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-void/80 px-3 py-1 font-mono text-[0.65rem] uppercase tracking-widest text-mist">
-        Avant
-      </span>
-      <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-void/80 px-3 py-1 font-mono text-[0.65rem] uppercase tracking-widest text-mist">
-        Après
-      </span>
+      <div className="pointer-events-none absolute inset-y-0 w-0.5 bg-paper" style={{ left: `${position}%` }} />
+      <span className={`${tag} left-3`}>Avant</span>
+      <span className={`${tag} right-3`}>Après</span>
       <input
         type="range"
         min="0"

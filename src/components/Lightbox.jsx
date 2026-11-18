@@ -3,32 +3,38 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { gsap } from '../animations/gsapAnimations.js';
 import BeforeAfter from './BeforeAfter.jsx';
 
-/** Visionneuse plein écran : image, vidéo locale, vidéo YouTube ou comparateur avant/après. */
-export default function Lightbox({ item, hasPrev, hasNext, onClose, onPrev, onNext }) {
-  const panelRef = useRef(null);
+/** Visionneuse plein écran : image, vidéo locale, vidéo YouTube ou comparateur avant / après. */
+export default function Lightbox({ item, categoryLabel, position, hasPrev, hasNext, onClose, onPrev, onNext }) {
+  const rootRef = useRef(null);
+  const mediaRef = useRef(null);
   const closeRef = useRef(null);
+  // Les derniers callbacks, lus par l'écouteur clavier installé une seule fois.
+  const actions = useRef({});
+  actions.current = { hasPrev, hasNext, onClose, onPrev, onNext };
 
-  // Ouverture animée (GSAP).
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from(panelRef.current, { opacity: 0, scale: 0.94, y: 20, duration: 0.4, ease: 'power3.out' });
-    }, panelRef);
-    return () => ctx.revert();
+    // fromTo (et non from) : l'état final reste correct même si l'effet est rejoué (StrictMode).
+    const tween = gsap.fromTo(
+      mediaRef.current,
+      { opacity: 0, scale: 0.97 },
+      { opacity: 1, scale: 1, duration: 0.35, ease: 'power3.out', clearProps: 'opacity,transform' }
+    );
+    return () => tween.kill();
   }, [item.id]);
 
-  // Focus, verrouillage du scroll et touches du clavier.
+  // Ouverture : scroll bloqué, focus sur « Fermer », clavier. Fermeture : focus rendu à la vignette.
   useEffect(() => {
     const opener = document.activeElement;
     document.documentElement.style.overflow = 'hidden';
     if (closeRef.current) closeRef.current.focus();
 
     const onKeyDown = (event) => {
-      if (event.key === 'Escape') onClose();
-      else if (event.key === 'ArrowLeft' && hasPrev) onPrev();
-      else if (event.key === 'ArrowRight' && hasNext) onNext();
-      else if (event.key === 'Tab' && panelRef.current) {
-        // Piège le focus dans la visionneuse.
-        const focusables = panelRef.current.parentElement.querySelectorAll('button, input, video, iframe, [href]');
+      const a = actions.current;
+      if (event.key === 'Escape') a.onClose();
+      else if (event.key === 'ArrowLeft' && a.hasPrev) a.onPrev();
+      else if (event.key === 'ArrowRight' && a.hasNext) a.onNext();
+      else if (event.key === 'Tab' && rootRef.current) {
+        const focusables = rootRef.current.querySelectorAll('button, input, video, iframe, [href]');
         if (!focusables.length) return;
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
@@ -47,13 +53,12 @@ export default function Lightbox({ item, hasPrev, hasNext, onClose, onPrev, onNe
       document.documentElement.style.overflow = '';
       if (opener && opener.focus) opener.focus();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasPrev, hasNext]);
+  }, []);
 
   let media;
   if (item.youtube) {
     media = (
-      <div className="aspect-video w-full overflow-hidden rounded-2xl bg-black">
+      <div className="aspect-video w-full max-w-5xl overflow-hidden rounded-2xl bg-black">
         <iframe
           title={item.title}
           src={`https://www.youtube-nocookie.com/embed/${item.youtube}?rel=0`}
@@ -72,7 +77,7 @@ export default function Lightbox({ item, hasPrev, hasNext, onClose, onPrev, onNe
         controls
         playsInline
         preload="metadata"
-        className="max-h-[70vh] w-full rounded-2xl bg-black"
+        className="max-h-[72vh] w-full max-w-5xl rounded-2xl bg-black"
       >
         Votre navigateur ne peut pas lire cette vidéo.
       </video>
@@ -80,64 +85,59 @@ export default function Lightbox({ item, hasPrev, hasNext, onClose, onPrev, onNe
   } else if (item.before) {
     media = <BeforeAfter before={item.before} after={item.src} alt={item.title} />;
   } else {
-    media = <img src={item.src} alt={item.title} className="max-h-[70vh] w-full rounded-2xl object-contain" />;
+    media = <img src={item.src} alt={item.title} className="max-h-[72vh] w-auto max-w-full rounded-2xl object-contain" />;
   }
+
+  const navButton =
+    'flex h-11 w-11 items-center justify-center rounded-full border border-line bg-coal/90 text-paper transition-colors hover:border-paper/50';
 
   return (
     <div
+      ref={rootRef}
       role="dialog"
       aria-modal="true"
       aria-label={item.title}
       onClick={onClose}
-      className="fixed inset-0 z-[95] flex items-center justify-center bg-void/92 p-4 backdrop-blur-md sm:p-8"
+      className="fixed inset-0 z-[95] flex flex-col bg-ink/95 backdrop-blur-md"
     >
-      <div ref={panelRef} onClick={(event) => event.stopPropagation()} className="relative flex max-h-full w-full max-w-5xl flex-col gap-4 overflow-y-auto">
-        {media}
-        <div className="px-1">
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-sun">
-            {item.year ? `${item.year} · ` : ''}
-            {item.category}
-          </p>
-          <h3 className="mt-1 text-xl font-bold">{item.title}</h3>
-          {item.description && <p className="mt-2 text-sm leading-relaxed text-mist/80">{item.description}</p>}
+      <div className="flex items-center justify-between px-4 py-4 sm:px-8">
+        <span className="font-mono text-xs text-stone">{position}</span>
+        <button ref={closeRef} type="button" onClick={onClose} aria-label="Fermer la visionneuse" className={navButton}>
+          <X className="h-5 w-5" aria-hidden="true" />
+        </button>
+      </div>
+
+      <div className="flex min-h-0 flex-1 items-center justify-center px-4 sm:px-20">
+        <div
+          ref={mediaRef}
+          // Clic sur l'image : rien. Clic à côté (dans la zone vide) : fermeture.
+          onClick={(event) => {
+            if (event.target !== event.currentTarget) event.stopPropagation();
+          }}
+          className="flex max-h-full w-full justify-center"
+        >
+          {media}
         </div>
       </div>
 
-      <button
-        ref={closeRef}
-        type="button"
-        onClick={onClose}
-        aria-label="Fermer la visionneuse"
-        className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-mist/25 bg-night/80 text-snow transition-colors hover:border-sun hover:text-sun sm:right-8 sm:top-8"
-      >
-        <X className="h-5 w-5" aria-hidden="true" />
-      </button>
-      {hasPrev && (
-        <button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            onPrev();
-          }}
-          aria-label="Réalisation précédente"
-          className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-mist/25 bg-night/80 text-snow transition-colors hover:border-sun hover:text-sun sm:left-6"
-        >
-          <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-        </button>
-      )}
-      {hasNext && (
-        <button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            onNext();
-          }}
-          aria-label="Réalisation suivante"
-          className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-mist/25 bg-night/80 text-snow transition-colors hover:border-sun hover:text-sun sm:right-6"
-        >
-          <ChevronRight className="h-5 w-5" aria-hidden="true" />
-        </button>
-      )}
+      <div className="flex items-end justify-between gap-6 px-4 pb-6 pt-4 sm:px-8" onClick={(event) => event.stopPropagation()}>
+        <div className="min-w-0">
+          <p className="label text-accent">
+            {item.year ? `${item.year} · ` : ''}
+            {categoryLabel}
+          </p>
+          <h3 className="mt-1 truncate text-xl font-semibold tracking-tight">{item.title}</h3>
+          {item.description && <p className="mt-1 text-sm text-stone">{item.description}</p>}
+        </div>
+        <div className="flex shrink-0 gap-2">
+          <button type="button" onClick={onPrev} disabled={!hasPrev} aria-label="Réalisation précédente" className={`${navButton} disabled:opacity-30`}>
+            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+          </button>
+          <button type="button" onClick={onNext} disabled={!hasNext} aria-label="Réalisation suivante" className={`${navButton} disabled:opacity-30`}>
+            <ChevronRight className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

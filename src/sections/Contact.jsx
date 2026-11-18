@@ -1,36 +1,35 @@
 import { useRef, useState } from 'react';
-import { Mail, Copy, Check, Linkedin, Github, Send } from 'lucide-react';
-import useGsap from '../hooks/useGsap.js';
-import { standardSectionAnimations } from '../animations/gsapAnimations.js';
+import { ArrowUpRight, Check, Copy, Github, Linkedin, MapPin, Phone, Send } from 'lucide-react';
 import { profile } from '../data/profile.js';
 import Section from '../components/Section.jsx';
 import SectionHeading from '../components/SectionHeading.jsx';
 import Button from '../components/Button.jsx';
-import { WorldAnchor } from '../components/WorldContext.jsx';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const EMPTY = { name: '', email: '', subject: '', message: '' };
 
 function validate(values) {
   const errors = {};
-  if (values.name.trim().length < 2) errors.name = 'Merci d’indiquer votre nom (2 caractères minimum).';
-  if (!values.email.trim()) errors.email = 'Merci d’indiquer votre adresse e-mail.';
-  else if (!EMAIL_PATTERN.test(values.email.trim())) errors.email = 'Cette adresse e-mail ne semble pas valide (ex. nom@exemple.com).';
-  if (values.subject.trim().length < 3) errors.subject = 'Merci d’indiquer un sujet (3 caractères minimum).';
+  if (values.name.trim().length < 2) errors.name = 'Indiquez votre nom (2 caractères minimum).';
+  if (!values.email.trim()) errors.email = 'Indiquez votre adresse e-mail.';
+  else if (!EMAIL_PATTERN.test(values.email.trim())) errors.email = 'Adresse e-mail invalide (ex. nom@exemple.com).';
+  if (values.subject.trim().length < 3) errors.subject = 'Indiquez un sujet (3 caractères minimum).';
   if (values.message.trim().length < 10) errors.message = 'Votre message est un peu court (10 caractères minimum).';
   return errors;
 }
 
-const EMPTY = { name: '', email: '', subject: '', message: '' };
+const inputClass =
+  'w-full rounded-xl border border-line bg-ink/70 px-4 py-3 text-[0.95rem] text-paper placeholder:text-paper/30 transition-colors focus:border-accent focus:outline-none aria-[invalid=true]:border-accent/70';
 
 function Field({ id, label, error, children }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-2 block text-sm font-medium text-snow">
+      <label htmlFor={id} className="mb-2 block text-sm text-paper/85">
         {label}
       </label>
       {children}
       {error && (
-        <p id={`${id}-error`} role="alert" className="mt-1.5 text-sm text-sun">
+        <p id={`${id}-error`} className="mt-1.5 text-sm text-accent-soft">
           {error}
         </p>
       )}
@@ -38,8 +37,24 @@ function Field({ id, label, error, children }) {
   );
 }
 
-const inputClass =
-  'w-full rounded-xl border border-mist/15 bg-void/60 px-4 py-3 text-sm text-snow placeholder:text-mist/40 transition-colors focus:border-ion focus:outline-none';
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    // Repli sans API Clipboard (contexte non sécurisé, ancien navigateur).
+    const temp = document.createElement('textarea');
+    temp.value = text;
+    temp.style.position = 'fixed';
+    temp.style.opacity = '0';
+    document.body.appendChild(temp);
+    temp.select();
+    try {
+      document.execCommand('copy');
+    } finally {
+      document.body.removeChild(temp);
+    }
+  }
+}
 
 export default function Contact() {
   const { contact, socials } = profile;
@@ -49,38 +64,16 @@ export default function Contact() {
   const [copied, setCopied] = useState(false);
   const formRef = useRef(null);
 
-  const ref = useGsap(({ reduced }) => {
-    if (reduced) return;
-    standardSectionAnimations(ref.current);
-  }, []);
-
   const onChange = (event) => {
     const { name, value } = event.target;
     setValues((current) => ({ ...current, [name]: value }));
     if (errors[name]) setErrors((current) => ({ ...current, [name]: undefined }));
   };
 
-  const copyEmail = async () => {
-    if (!contact.email) return;
-    try {
-      await navigator.clipboard.writeText(contact.email);
-    } catch (error) {
-      // Repli pour les navigateurs sans API Clipboard (ou contexte non sécurisé).
-      const temp = document.createElement('textarea');
-      temp.value = contact.email;
-      temp.setAttribute('readonly', '');
-      temp.style.position = 'fixed';
-      temp.style.opacity = '0';
-      document.body.appendChild(temp);
-      temp.select();
-      try {
-        document.execCommand('copy');
-      } finally {
-        document.body.removeChild(temp);
-      }
-    }
+  const onCopy = async () => {
+    await copyText(contact.email);
     setCopied(true);
-    window.setTimeout(() => setCopied(false), 2500);
+    window.setTimeout(() => setCopied(false), 2200);
   };
 
   const onSubmit = async (event) => {
@@ -95,7 +88,10 @@ export default function Contact() {
       return;
     }
 
-    // 1) Service de formulaire configuré (ex. Formspree) : envoi réel.
+    // Honeypot : un robot remplit ce champ invisible, un humain non.
+    const trap = formRef.current && formRef.current.elements._gotcha;
+    if (trap && trap.value) return;
+
     if (contact.formEndpoint) {
       setStatus({ type: 'loading', message: 'Envoi en cours…' });
       try {
@@ -106,191 +102,129 @@ export default function Contact() {
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         setValues(EMPTY);
-        setStatus({ type: 'success', message: 'Message envoyé, merci ! Je vous répondrai dès que possible.' });
-      } catch (error) {
+        setStatus({ type: 'success', message: 'Message envoyé, merci ! Je vous réponds au plus vite.' });
+      } catch {
         setStatus({
           type: 'error',
-          message: 'L’envoi a échoué. Merci de réessayer plus tard ou de me contacter directement par e-mail.',
+          message: 'L’envoi a échoué. Réessayez plus tard ou écrivez-moi directement par e-mail.',
         });
       }
       return;
     }
 
-    // 2) Sans backend : ouverture du client de messagerie avec les champs préremplis (mailto:).
-    if (!contact.email) {
-      setStatus({
-        type: 'error',
-        message: 'L’adresse e-mail de destination n’est pas encore configurée : le message ne peut pas être préparé.',
-      });
-      return;
-    }
+    // Sans service de formulaire : ouverture du client de messagerie.
     const body = `${values.message.trim()}\n\n—\n${values.name.trim()}\n${values.email.trim()}`;
-    const href = `mailto:${contact.email}?subject=${encodeURIComponent(values.subject.trim())}&body=${encodeURIComponent(body)}`;
-    window.location.href = href;
-    setStatus({
-      type: 'success',
-      message: 'Votre application de messagerie devrait s’ouvrir avec le message prérempli. Il vous reste à l’envoyer.',
-    });
+    window.location.href = `mailto:${contact.email}?subject=${encodeURIComponent(values.subject.trim())}&body=${encodeURIComponent(body)}`;
+    setStatus({ type: 'success', message: 'Votre messagerie devrait s’ouvrir avec le message prérempli.' });
   };
 
-  const hasEmail = Boolean(contact.email);
+  const describedBy = (name) => (errors[name] ? `contact-${name}-error` : undefined);
 
   return (
-    <div ref={ref}>
-      <Section id="contact" wave="a">
-        <SectionHeading id="contact" eyebrow="08 · Contact" title={profile.contactSection.title} description={profile.contactSection.text} />
+    <Section id="contact" className="border-t border-line">
+      <SectionHeading id="contact" index="07" label="Contact" title={profile.contactSection.title} text={profile.contactSection.text} />
 
-        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-          <div data-reveal className="space-y-6">
-            <ul className="space-y-3">
-              <li>
-                <Button
-                  href={hasEmail ? `mailto:${contact.email}` : undefined}
-                  icon={Mail}
-                  disabled={!hasEmail}
-                  disabledReason="Adresse e-mail bientôt disponible"
-                  className="w-full sm:w-auto"
-                >
-                  Envoyer un e-mail
-                </Button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={copyEmail}
-                  disabled={!hasEmail}
-                  title={hasEmail ? undefined : 'Adresse e-mail bientôt disponible'}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-mist/25 bg-night/40 px-6 py-3 text-sm font-semibold text-snow transition-all hover:border-ion hover:text-ion disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto"
-                >
-                  {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-                  {copied ? 'Adresse copiée' : 'Copier mon adresse e-mail'}
-                </button>
-                <span className="sr-only" role="status" aria-live="polite">
-                  {copied ? 'Adresse e-mail copiée dans le presse-papiers' : ''}
-                </span>
-              </li>
-            </ul>
-
-            {hasEmail && <p className="font-mono text-sm text-mist/80">{contact.email}</p>}
-            {contact.location && <p className="text-sm text-mist/70">{contact.location}</p>}
-
-            <div className="flex flex-wrap gap-3">
-              <Button
-                href={socials.linkedin || undefined}
-                external
-                icon={Linkedin}
-                variant="outline"
-                disabled={!socials.linkedin}
-                disabledReason="Lien LinkedIn bientôt disponible"
-              >
-                LinkedIn
-              </Button>
-              <Button
-                href={socials.github || undefined}
-                external
-                icon={Github}
-                variant="outline"
-                disabled={!socials.github}
-                disabledReason="Lien GitHub bientôt disponible"
-              >
-                GitHub
-              </Button>
-            </div>
-
-            {/* Dernière planète : globe 3D (Three.js) dessiné par le canvas fixe sur cette zone */}
-            <WorldAnchor
-              name="contact"
-              label="Globe 3D en maillage entouré d’anneaux et de satellites"
-              className="mt-2 h-64 w-full sm:h-80"
-            />
+      <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
+        <div data-reveal className="lg:col-span-5">
+          <p className="label">E-mail</p>
+          <a
+            href={`mailto:${contact.email}`}
+            className="group mt-3 inline-flex max-w-full items-center gap-2 font-display text-[clamp(1.15rem,5.6vw,1.875rem)] font-medium tracking-tight text-paper transition-colors hover:text-accent"
+          >
+            <span className="min-w-0 [overflow-wrap:anywhere]">{contact.email}</span>
+            <ArrowUpRight className="h-5 w-5 shrink-0 sm:h-6 sm:w-6 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+          </a>
+          <div className="mt-5">
+            <button
+              type="button"
+              onClick={onCopy}
+              className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm text-stone transition-colors hover:border-paper/40 hover:text-paper"
+            >
+              {copied ? <Check className="h-4 w-4 text-[#28C840]" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
+              {copied ? 'Adresse copiée' : 'Copier l’adresse'}
+            </button>
+            <span className="sr-only" role="status" aria-live="polite">
+              {copied ? 'Adresse e-mail copiée' : ''}
+            </span>
           </div>
 
-          <form
-            ref={formRef}
-            data-reveal
-            onSubmit={onSubmit}
-            noValidate
-            aria-label="Formulaire de contact"
-            className="glass relative space-y-5 rounded-3xl p-5 sm:p-8"
-          >
-            <div className="grid gap-5 sm:grid-cols-2">
-              <Field id="name" label="Nom" error={errors.name}>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  value={values.name}
-                  onChange={onChange}
-                  aria-invalid={Boolean(errors.name)}
-                  aria-describedby={errors.name ? 'name-error' : undefined}
-                  className={inputClass}
-                  placeholder="Votre nom"
-                />
-              </Field>
-              <Field id="email" label="Adresse e-mail" error={errors.email}>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  value={values.email}
-                  onChange={onChange}
-                  aria-invalid={Boolean(errors.email)}
-                  aria-describedby={errors.email ? 'email-error' : undefined}
-                  className={inputClass}
-                  placeholder="vous@exemple.com"
-                />
-              </Field>
-            </div>
-            <Field id="subject" label="Sujet" error={errors.subject}>
-              <input
-                id="subject"
-                name="subject"
-                type="text"
-                value={values.subject}
-                onChange={onChange}
-                aria-invalid={Boolean(errors.subject)}
-                aria-describedby={errors.subject ? 'subject-error' : undefined}
-                className={inputClass}
-                placeholder="Opportunité de stage, projet, collaboration…"
-              />
-            </Field>
-            <Field id="message" label="Message" error={errors.message}>
-              <textarea
-                id="message"
-                name="message"
-                rows={5}
-                value={values.message}
-                onChange={onChange}
-                aria-invalid={Boolean(errors.message)}
-                aria-describedby={errors.message ? 'message-error' : undefined}
-                className={`${inputClass} resize-y`}
-                placeholder="Parlez-moi de votre projet ou de votre besoin…"
-              />
-            </Field>
+          <ul className="mt-12 divide-y divide-line border-y border-line text-sm">
+            {contact.phone && (
+              <li>
+                <a href={`tel:${contact.phone.replace(/\s/g, '')}`} className="flex items-center gap-3 py-4 text-paper/85 transition-colors hover:text-paper">
+                  <Phone className="h-4 w-4 text-stone" aria-hidden="true" />
+                  {contact.phone}
+                </a>
+              </li>
+            )}
+            <li className="flex items-center gap-3 py-4 text-paper/85">
+              <MapPin className="h-4 w-4 text-stone" aria-hidden="true" />
+              {contact.location}
+            </li>
+          </ul>
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <Button type="submit" icon={Send} disabled={false} className={status.type === 'loading' ? 'pointer-events-none opacity-70' : ''}>
-                {status.type === 'loading' ? 'Envoi…' : 'Envoyer le message'}
+          <div className="mt-8 flex flex-wrap gap-3">
+            {socials.linkedin && (
+              <Button href={socials.linkedin} icon={Linkedin} variant="outline" size="sm">
+                LinkedIn
               </Button>
-              <p className="text-xs text-mist/60">
-                {contact.formEndpoint
-                  ? 'Votre message est envoyé via un service de formulaire.'
-                  : 'Ce formulaire ouvre votre application de messagerie avec le message prérempli.'}
-              </p>
-            </div>
-
-            <p
-              role={status.type === 'error' ? 'alert' : 'status'}
-              aria-live="polite"
-              className={`min-h-[1.25rem] text-sm ${status.type === 'error' ? 'text-sun' : 'text-ion'}`}
-            >
-              {status.message}
-            </p>
-          </form>
+            )}
+            {socials.github && (
+              <Button href={socials.github} icon={Github} variant="outline" size="sm">
+                GitHub
+              </Button>
+            )}
+          </div>
         </div>
-      </Section>
-    </div>
+
+        <form
+          ref={formRef}
+          data-reveal
+          noValidate
+          onSubmit={onSubmit}
+          aria-label="Formulaire de contact"
+          className="card p-6 sm:p-9 lg:col-span-7"
+        >
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field id="contact-name" label="Nom" error={errors.name}>
+              <input id="contact-name" name="name" autoComplete="name" value={values.name} onChange={onChange} placeholder="Votre nom" aria-invalid={Boolean(errors.name)} aria-describedby={describedBy('name')} className={inputClass} />
+            </Field>
+            <Field id="contact-email" label="E-mail" error={errors.email}>
+              <input id="contact-email" name="email" type="email" autoComplete="email" value={values.email} onChange={onChange} placeholder="vous@exemple.com" aria-invalid={Boolean(errors.email)} aria-describedby={describedBy('email')} className={inputClass} />
+            </Field>
+          </div>
+          <div className="mt-5">
+            <Field id="contact-subject" label="Sujet" error={errors.subject}>
+              <input id="contact-subject" name="subject" value={values.subject} onChange={onChange} placeholder="Stage, projet, collaboration…" aria-invalid={Boolean(errors.subject)} aria-describedby={describedBy('subject')} className={inputClass} />
+            </Field>
+          </div>
+          <div className="mt-5">
+            <Field id="contact-message" label="Message" error={errors.message}>
+              <textarea id="contact-message" name="message" rows={6} value={values.message} onChange={onChange} placeholder="Parlez-moi de votre projet ou de votre besoin…" aria-invalid={Boolean(errors.message)} aria-describedby={describedBy('message')} className={`${inputClass} resize-y`} />
+            </Field>
+          </div>
+
+          <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
+
+          <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
+            <button
+              type="submit"
+              disabled={status.type === 'loading'}
+              className="group inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-sm font-medium text-ink transition-colors hover:bg-accent-soft disabled:opacity-60"
+            >
+              <Send className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              {status.type === 'loading' ? 'Envoi…' : 'Envoyer le message'}
+            </button>
+            <p
+              role="status"
+              aria-live="polite"
+              className={`text-sm ${status.type === 'error' ? 'text-accent-soft' : status.type === 'success' ? 'text-[#5BD87A]' : 'text-stone'}`}
+            >
+              {status.message || 'Tous les champs sont requis.'}
+            </p>
+          </div>
+        </form>
+      </div>
+    </Section>
   );
 }

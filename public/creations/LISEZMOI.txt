@@ -16,5 +16,4 @@ Exemple :
     description: 'Affiche A3 réalisée pour …',
     type: 'image',
     src: '/creations/affiche-concert.webp',
-    ratio: 'portrait',
   }

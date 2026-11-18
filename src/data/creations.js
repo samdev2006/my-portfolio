@@ -1,135 +1,105 @@
-// Galerie « Créations » : affiches, montages vidéo, retouches photo…
+// Galerie « Créations » : affiches, montages vidéo, retouches photo.
 //
-// COMMENT AJOUTER UNE RÉALISATION
-//  1. Déposez le fichier dans public/creations/ (images .webp/.jpg/.png, vidéos .mp4).
-//  2. Ajoutez un objet au tableau `creations` ci-dessous.
-//  3. Supprimez les entrées « emplacement » (src et youtube vides) quand vous avez vos vraies œuvres.
+// AJOUTER UNE RÉALISATION
+//  1. Déposez le fichier dans public/creations/ (image .webp/.jpg/.png, vidéo .mp4).
+//  2. Ajoutez un objet au tableau `creations` (id UNIQUE obligatoire).
+//  Une catégorie sans réalisation n'apparaît pas dans les filtres.
 //
 // Champs :
-//  - id         : identifiant unique
-//  - category   : 'affiches' | 'videos' | 'photos' (ou une catégorie que vous ajoutez dans creationCategories)
-//  - title      : titre affiché
-//  - description: courte description (client, contexte, outils… uniquement des faits réels)
-//  - type       : 'image' | 'video'
-//  - src        : chemin du fichier, ex. '/creations/affiche-concert.webp' (image) ou '/creations/clip.mp4' (vidéo)
-//  - youtube    : identifiant YouTube (ex. 'dQw4w9WgXcQ') pour une vidéo hébergée sur YouTube (remplace src)
-//  - poster     : image de couverture d'une vidéo (facultatif)
-//  - before     : pour une retouche photo, image « avant » (src = image « après ») -> comparateur avant/après
-//  - ratio      : 'portrait' | 'landscape' | 'square' (forme de la vignette)
-//  - year       : année (facultatif)
+//  - id          : identifiant unique
+//  - category    : 'affiches' | 'videos' | 'photos'
+//  - title       : titre affiché
+//  - description : contexte réel (client, événement, outils…)
+//  - type        : 'image' | 'video'
+//  - src         : chemin du fichier (image, ou vidéo .mp4)
+//  - youtube     : identifiant d'une vidéo YouTube (remplace src), ex. 'dQw4w9WgXcQ'
+//  - poster      : image de couverture d'une vidéo (facultatif)
+//  - before      : retouche photo -> image « avant » (src = « après ») : comparateur avant / après
+//  - year        : année (facultatif)
 //
-// Une entrée sans `src` ni `youtube` est affichée comme « Emplacement libre » (non cliquable).
+// Exemples :
+//  { id: 'clip-1', category: 'videos', title: 'Aftermovie', type: 'video', youtube: 'ID_YOUTUBE' },
+//  { id: 'retouche-1', category: 'photos', title: 'Portrait', type: 'image',
+//    before: '/creations/portrait-avant.webp', src: '/creations/portrait-apres.webp' },
 
 export const creationCategories = [
-  { id: "all", label: "Tout" },
-  { id: "affiches", label: "Affiches" },
-  { id: "videos", label: "Montage vidéo" },
-  { id: "photos", label: "Retouche photo" },
+  { id: 'all', label: 'Tout' },
+  { id: 'affiches', label: 'Affiches' },
+  { id: 'videos', label: 'Montage vidéo' },
+  { id: 'photos', label: 'Retouche photo' },
 ];
 
 export const creations = [
   {
-    id: "affiche-1",
-    category: "affiches",
-    title: "Affiche Alloco party (2024-JBD)",
-    description: "Affiche d'un évènement chrétiens Cocody Angré 10ème tranche",
-    type: "image",
-    src: "/creations/alloco party.jpeg",
-    ratio: "portrait",
+    id: 'chill-in-christ',
+    category: 'affiches',
+    title: 'Chill in Christ',
+    description: 'Affiche d’un événement chrétien, Cocody Angré 10ᵉ tranche.',
+    type: 'image',
+    src: '/creations/chiil in christ.jpeg',
   },
   {
-    id: "affiche-2",
-    category: "affiches",
-    title: "Affiche Chill in Christ",
-    description: "Affiche d'un évènement chrétiens Cocody Angré 10ème tranche",
-    type: "image",
-    src: "/creations/chiil in christ.jpeg",
-    ratio: "portrait",
+    id: 'stane-pins',
+    category: 'affiches',
+    title: 'STANE Group — Pins',
+    description: 'Affiche publicitaire pour une entreprise d’imprimerie.',
+    type: 'image',
+    src: '/creations/stanegroup1.jpeg',
   },
   {
-    id: "affiche-3",
-    category: "affiches",
-    title: "Affiche Ecole du Disciple",
-    description: "Affiche d'un programme chrétiens chrétiens.",
-    type: "image",
-    src: "/creations/EDD.jpeg",
-    ratio: "portrait",
+    id: 'ecole-du-disciple',
+    category: 'affiches',
+    title: 'L’École du Disciple',
+    description: 'Affiche d’un programme chrétien.',
+    type: 'image',
+    src: '/creations/EDD.jpeg',
   },
   {
-    id: "affiche-4",
-    category: "affiches",
-    title: "Rencontre zoom",
-    description: "Affiche d'un programme chrétiens chrétiens.",
-    type: "image",
-    src: "/creations/zoom.jpeg",
-    ratio: "portrait",
+    id: 'stane-cadre',
+    category: 'affiches',
+    title: 'STANE Group — Cadres photo',
+    description: 'Affiche publicitaire pour une entreprise d’imprimerie.',
+    type: 'image',
+    src: '/creations/stanegroup2.jpeg',
   },
   {
-    id: "affiche-5",
-    category: "affiches",
-    title: "Affiche Pins STANE GROUP",
-    description: "Affiche pour une entreprise d'imprimerie",
-    type: "image",
-    src: "/creations/stanegroup1.jpeg",
-    ratio: "portrait",
+    id: 'rencontre-zoom',
+    category: 'affiches',
+    title: 'RDV des vendredis — Zoom',
+    description: 'Affiche d’une rencontre en ligne d’un programme chrétien.',
+    type: 'image',
+    src: '/creations/zoom.jpeg',
   },
   {
-    id: "affiche-6",
-    category: "affiches",
-    title: "Affiche Cadre photo STANE GROUP",
-    description: "Affiche pour une entreprise d'imprimerie",
-    type: "image",
-    src: "/creations/stanegroup2.jpeg",
-    ratio: "portrait",
+    id: 'stane-tampon',
+    category: 'affiches',
+    title: 'STANE Group — Tampons',
+    description: 'Affiche publicitaire pour une entreprise d’imprimerie.',
+    type: 'image',
+    src: '/creations/stanegroup3.jpeg',
   },
   {
-    id: "affiche-7",
-    category: "affiches",
-    title: "Affiche Tampon STANE GROUP",
-    description: "Affiche pour une entreprise d'imprimerie",
-    type: "image",
-    src: "/creations/stanegroup3.jpeg",
-    ratio: "portrait",
+    id: 'alloco-party',
+    category: 'affiches',
+    title: 'Alloco Party 2024',
+    description: 'Affiche d’un événement chrétien (JBD), Cocody Angré 10ᵉ tranche.',
+    type: 'image',
+    src: '/creations/alloco party.jpeg',
   },
   {
-    id: "affiche-7",
-    category: "affiches",
-    title: "Affiche Personnalisez vos textiles STANE GROUP",
-    description: "Affiche pour une entreprise d'imprimerie",
-    type: "image",
-    src: "/creations/stanegroup4.jpeg",
-    ratio: "portrait",
+    id: 'stane-textile',
+    category: 'affiches',
+    title: 'STANE Group — Textiles',
+    description: 'Affiche publicitaire pour une entreprise d’imprimerie.',
+    type: 'image',
+    src: '/creations/stanegroup4.jpeg',
   },
   {
-    id: "affiche-8",
-    category: "affiches",
-    title: "Affiche Personnalisez vos Cachet STANE GROUP",
-    description: "Affiche pour une entreprise d'imprimerie",
-    type: "image",
-    src: "/creations/stanegroup5.jpeg",
-    ratio: "portrait",
-  },
-
-  //VIDEO
-  {
-    id: "video-1",
-    category: "videos",
-    title: "Montage vidéo — emplacement libre",
-    description: "",
-    type: "video",
-    src: "",
-    youtube: "",
-    poster: "",
-    ratio: "landscape",
-  },
-  {
-    id: "photo-1",
-    category: "photos",
-    title: "Retouche photo — emplacement libre",
-    description: "",
-    type: "image",
-    src: "",
-    before: "",
-    ratio: "square",
+    id: 'stane-cachet',
+    category: 'affiches',
+    title: 'STANE Group — Cachets',
+    description: 'Affiche publicitaire pour une entreprise d’imprimerie.',
+    type: 'image',
+    src: '/creations/stanegroup5.jpeg',
   },
 ];
