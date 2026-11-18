@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Search } from 'lucide-react';
 import { navLinks, profile } from '../data/profile.js';
 import CvButton from './CvButton.jsx';
+import { openCommandPalette } from './CommandPalette.jsx';
+
+const SHORTCUT = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘ K' : 'Ctrl K';
 
 /** Barre de navigation fixe : fond flouté au scroll, section active soulignée, menu plein écran sur mobile. */
 export default function Navbar() {
@@ -10,9 +13,15 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
   const toggleRef = useRef(null);
+  const progressRef = useRef(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 24);
+      // Barre de lecture : mise à jour directe du style, sans re-rendu React.
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (progressRef.current) progressRef.current.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -66,7 +75,7 @@ export default function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       <div
-        className={`transition-colors duration-500 ${
+        className={`relative transition-colors duration-500 ${
           scrolled || open ? 'border-b border-line bg-ink/80 backdrop-blur-xl' : 'border-b border-transparent'
         }`}
       >
@@ -97,6 +106,16 @@ export default function Navbar() {
           </ul>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={openCommandPalette}
+              aria-label="Ouvrir la palette de commandes (Ctrl+K)"
+              className="hidden h-9 items-center gap-2 rounded-full border border-line bg-coal/60 pl-3 pr-2 text-[0.8rem] text-stone transition-colors hover:border-paper/30 hover:text-paper lg:inline-flex"
+            >
+              <Search className="h-3.5 w-3.5" aria-hidden="true" />
+              Rechercher
+              <kbd className="rounded-md border border-line bg-graphite px-1.5 font-mono text-[0.65rem]">{SHORTCUT}</kbd>
+            </button>
             <CvButton size="sm" label="CV" className="hidden sm:inline-flex" />
             <button
               ref={toggleRef}
@@ -111,6 +130,9 @@ export default function Navbar() {
             </button>
           </div>
         </nav>
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-[-1px] h-px">
+          <div ref={progressRef} className="h-full origin-left scale-x-0 bg-accent" />
+        </div>
       </div>
 
       {open && (

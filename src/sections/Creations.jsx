@@ -53,7 +53,7 @@ export default function Creations() {
       <Section id="creations" className="border-t border-line">
         <SectionHeading
           id="creations"
-          index="04"
+          index="05"
           label="Créations"
           title="Au-delà du code : l’image."
           text="Affiches et visuels réalisés pour des événements, des communautés et des entreprises. Cliquez sur une image pour l’agrandir."

@@ -4,6 +4,7 @@ import { profile } from '../data/profile.js';
 import Section from '../components/Section.jsx';
 import SectionHeading from '../components/SectionHeading.jsx';
 import Button from '../components/Button.jsx';
+import { copyText } from '../utils/clipboard.js';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const EMPTY = { name: '', email: '', subject: '', message: '' };
@@ -35,25 +36,6 @@ function Field({ id, label, error, children }) {
       )}
     </div>
   );
-}
-
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch {
-    // Repli sans API Clipboard (contexte non sécurisé, ancien navigateur).
-    const temp = document.createElement('textarea');
-    temp.value = text;
-    temp.style.position = 'fixed';
-    temp.style.opacity = '0';
-    document.body.appendChild(temp);
-    temp.select();
-    try {
-      document.execCommand('copy');
-    } finally {
-      document.body.removeChild(temp);
-    }
-  }
 }
 
 export default function Contact() {
@@ -122,7 +104,7 @@ export default function Contact() {
 
   return (
     <Section id="contact" className="border-t border-line">
-      <SectionHeading id="contact" index="07" label="Contact" title={profile.contactSection.title} text={profile.contactSection.text} />
+      <SectionHeading id="contact" index="08" label="Contact" title={profile.contactSection.title} text={profile.contactSection.text} />
 
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
         <div data-reveal className="lg:col-span-5">

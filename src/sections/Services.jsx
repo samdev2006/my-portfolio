@@ -15,7 +15,7 @@ export default function Services() {
     <Section id="services" className="border-t border-line">
       <SectionHeading
         id="services"
-        index="06"
+        index="07"
         label="Services"
         title="Ce que je peux réaliser pour vous."
         text="Du développement web, mobile et d’API, mais aussi de la création visuelle."

@@ -50,7 +50,7 @@ export default function Journey() {
 
   return (
     <Section id="parcours" className="border-t border-line">
-      <SectionHeading id="parcours" index="05" label="Parcours" title="Une trajectoire, étape par étape." />
+      <SectionHeading id="parcours" index="06" label="Parcours" title="Une trajectoire, étape par étape." />
 
       <div className="grid gap-16 lg:grid-cols-2 lg:gap-14">
         <Column icon={Briefcase} title="Expérience">

@@ -72,6 +72,14 @@ Les messages passent par Formspree (`contact.formEndpoint` dans `profile.js`). L
 
 `public/images/og-cover.png` (1200 × 630) est l'aperçu affiché sur LinkedIn, WhatsApp, etc. Les balises `og:*` de `index.html` utilisent l'adresse complète du site : mettez-les à jour si le domaine change.
 
+## Fonctionnalités
+
+- **Activité GitHub en direct** (`sections/GithubActivity.jsx`) : statistiques, langages et 6 derniers dépôts publics, lus depuis l'API GitHub à partir de `socials.github` (cache 1 h dans le navigateur, message de repli si l'API ne répond pas). Les forks et le dépôt README du profil sont ignorés. Ajoutez une description à vos dépôts sur GitHub : elle s'affiche sur les cartes.
+- **Palette de commandes** : `Ctrl + K` / `⌘ + K` (ou le bouton « Rechercher » de la barre de navigation) pour aller à une section, copier l'e-mail, télécharger le CV, ouvrir GitHub ou LinkedIn.
+- **Barre de lecture** sous la navigation.
+- **Référencement** : données structurées `Person` (JSON-LD) dans `index.html`, `public/robots.txt` et `public/sitemap.xml`. Mettez à jour leur adresse si le domaine change.
+- **Message dans la console** pour les développeurs curieux.
+
 ## Architecture
 
 ```
