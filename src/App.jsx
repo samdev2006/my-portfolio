@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { ScrollTrigger } from './animations/gsapAnimations.js';
 import { profile } from './data/profile.js';
+import { useLang } from './i18n/LanguageContext.jsx';
 import Navbar from './components/Navbar.jsx';
 import CommandPalette from './components/CommandPalette.jsx';
 import Hero from './sections/Hero.jsx';
@@ -15,22 +16,18 @@ import Contact from './sections/Contact.jsx';
 import Footer from './sections/Footer.jsx';
 
 // Petit mot pour les développeurs qui ouvrent la console.
-function greetDevelopers() {
+function greetDevelopers(text) {
   if (typeof window === 'undefined' || window.__portfolioGreeted) return;
   window.__portfolioGreeted = true;
-  console.log(
-    '%cSalut, développeur 👋',
-    'font: 600 18px system-ui; color: #FF6B1A;'
-  );
-  console.log(
-    `Vous inspectez le code ? Il est ouvert : ${profile.sourceCode.repoUrl}\nUn stage, un projet, une question : ${profile.contact.email}\nAstuce : Ctrl / ⌘ + K pour naviguer.`
-  );
+  console.log(`%c${text.hello}`, 'font: 600 18px system-ui; color: #FF6B1A;');
+  console.log(text.body(profile.sourceCode.repoUrl, profile.contact.email));
 }
 
 export default function App() {
+  const { ui } = useLang();
   // Recalcule les positions ScrollTrigger quand la mise en page change (polices, images).
   useEffect(() => {
-    greetDevelopers();
+    greetDevelopers(ui.console);
     let timer;
     const refresh = () => {
       clearTimeout(timer);
@@ -47,7 +44,7 @@ export default function App() {
   return (
     <div className="grain">
       <a href="#main" className="skip-link">
-        Aller au contenu principal
+        {ui.common.skip}
       </a>
       <Navbar />
       <main id="main" className="relative overflow-x-clip">

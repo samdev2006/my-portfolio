@@ -4,11 +4,13 @@ import Section from '../components/Section.jsx';
 import SectionHeading from '../components/SectionHeading.jsx';
 import CreationCard, { isEmptyCreation } from '../components/CreationCard.jsx';
 import Lightbox from '../components/Lightbox.jsx';
+import { useLang } from '../i18n/LanguageContext.jsx';
 
 const items = creations.filter((item) => !isEmptyCreation(item));
-const labelOf = (id) => (creationCategories.find((c) => c.id === id) || { label: id }).label;
 
 export default function Creations() {
+  const { tr, ui } = useLang();
+  const labelOf = (id) => tr((creationCategories.find((c) => c.id === id) || { label: id }).label);
   const [filter, setFilter] = useState('all');
   const [animateCards, setAnimateCards] = useState(false);
   const [openId, setOpenId] = useState(null);
@@ -26,7 +28,7 @@ export default function Creations() {
 
   const filters =
     categories.length > 2 ? (
-      <div role="group" aria-label="Filtrer les créations" className="flex flex-wrap gap-2">
+      <div role="group" aria-label={ui.creations.filter} className="flex flex-wrap gap-2">
         {categories.map((category) => (
           <button
             key={category.id}
@@ -42,7 +44,7 @@ export default function Creations() {
                 : 'border-line text-stone hover:border-paper/40 hover:text-paper'
             }`}
           >
-            {category.label}
+            {tr(category.label)}
           </button>
         ))}
       </div>
@@ -54,9 +56,9 @@ export default function Creations() {
         <SectionHeading
           id="creations"
           index="05"
-          label="Créations"
-          title="Au-delà du code : l’image."
-          text="Affiches et visuels réalisés pour des événements, des communautés et des entreprises. Cliquez sur une image pour l’agrandir."
+          label={ui.creations.label}
+          title={ui.creations.title}
+          text={ui.creations.text}
           aside={filters}
         />
 

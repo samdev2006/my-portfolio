@@ -1,5 +1,6 @@
 import { ArrowUpRight, Github } from 'lucide-react';
 import Button from './Button.jsx';
+import { useLang } from '../i18n/LanguageContext.jsx';
 
 function hostOf(url) {
   try {
@@ -11,6 +12,7 @@ function hostOf(url) {
 
 /** Visuel du projet dans un cadre de navigateur. Sans capture : couverture typographique. */
 function ProjectVisual({ project }) {
+  const { tr, ui } = useLang();
   const address = hostOf(project.demoUrl) || `${project.id}.app`;
 
   return (
@@ -28,7 +30,7 @@ function ProjectVisual({ project }) {
         {project.image ? (
           <img
             src={project.image.src}
-            alt={project.image.alt}
+            alt={tr(project.image.alt)}
             loading="lazy"
             className="h-full w-full object-cover object-top transition-transform duration-[1.2s] ease-out group-hover:scale-[1.03]"
           />
@@ -39,11 +41,11 @@ function ProjectVisual({ project }) {
               background: `radial-gradient(120% 90% at 100% 0%, ${project.accent}55, transparent 60%), radial-gradient(80% 80% at 0% 100%, ${project.accent}22, transparent 60%), #141416`,
             }}
           >
-            <span className="label">{project.tagline}</span>
+            <span className="label">{tr(project.tagline)}</span>
             <span className="font-display text-5xl font-semibold tracking-[-0.04em] text-paper sm:text-6xl">
               {project.name}
             </span>
-            <span className="font-mono text-[0.7rem] uppercase tracking-[0.18em] text-paper/50">Capture bientôt disponible</span>
+            <span className="font-mono text-[0.7rem] uppercase tracking-[0.18em] text-paper/50">{ui.projects.screenshotSoon}</span>
           </div>
         )}
       </div>
@@ -52,6 +54,7 @@ function ProjectVisual({ project }) {
 }
 
 export default function ProjectCard({ project, index }) {
+  const { tr, ui } = useLang();
   const reversed = index % 2 === 1;
 
   return (
@@ -69,10 +72,10 @@ export default function ProjectCard({ project, index }) {
           {project.status && (
             <span className="chip">
               <span
-                className={`mr-2 h-1.5 w-1.5 rounded-full ${project.status === 'En ligne' ? 'bg-[#28C840]' : 'bg-[#FEBC2E]'}`}
+                className={`mr-2 h-1.5 w-1.5 rounded-full ${project.status === 'live' ? 'bg-[#28C840]' : 'bg-[#FEBC2E]'}`}
                 aria-hidden="true"
               />
-              {project.status}
+              {ui.projects.status[project.status] || project.status}
             </span>
           )}
         </div>
@@ -80,20 +83,20 @@ export default function ProjectCard({ project, index }) {
         <h3 id={`projet-${project.id}`} className="mt-5 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
           {project.name}
         </h3>
-        <p className="mt-2 font-display text-lg text-paper/70">{project.tagline}</p>
+        <p className="mt-2 font-display text-lg text-paper/70">{tr(project.tagline)}</p>
 
-        <p className="mt-6 leading-relaxed text-stone">{project.description}</p>
+        <p className="mt-6 leading-relaxed text-stone">{tr(project.description)}</p>
 
         {project.problem && (
           <p className="mt-5 border-l-2 border-accent/60 pl-4 text-sm leading-relaxed text-paper/80">
-            <span className="label mb-1 block text-accent">Problème résolu</span>
-            {project.problem}
+            <span className="label mb-1 block text-accent">{ui.projects.problem}</span>
+            {tr(project.problem)}
           </p>
         )}
 
         {project.features.length > 0 && (
           <ul className="mt-6 grid gap-2 text-sm text-paper/85">
-            {project.features.map((feature) => (
+            {tr(project.features).map((feature) => (
               <li key={feature} className="flex gap-3">
                 <span className="mt-[0.55rem] h-1 w-3 shrink-0 rounded-full bg-accent" aria-hidden="true" />
                 {feature}
@@ -103,7 +106,7 @@ export default function ProjectCard({ project, index }) {
         )}
 
         {project.tech.length > 0 && (
-          <ul aria-label="Technologies" className="mt-7 flex flex-wrap gap-2">
+          <ul aria-label={ui.projects.technologies} className="mt-7 flex flex-wrap gap-2">
             {project.tech.map((tech) => (
               <li key={tech} className="chip">
                 {tech}
@@ -116,12 +119,12 @@ export default function ProjectCard({ project, index }) {
           <div className="mt-8 flex flex-wrap gap-3">
             {project.demoUrl && (
               <Button href={project.demoUrl} iconRight={ArrowUpRight} variant="light" size="sm">
-                Voir le site
+                {ui.projects.viewSite}
               </Button>
             )}
             {project.repoUrl && (
               <Button href={project.repoUrl} icon={Github} variant="outline" size="sm">
-                Code source
+                {ui.projects.source}
               </Button>
             )}
           </div>

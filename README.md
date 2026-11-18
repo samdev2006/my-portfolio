@@ -24,6 +24,17 @@ Node.js 18 ou plus récent.
 
 Tout le contenu se trouve dans `src/data/` : aucun composant à modifier pour les cas courants. Une valeur vide (`''` ou `[]`) masque le bloc correspondant.
 
+### Français / anglais
+
+Le site existe en français (par défaut) et en anglais. Le visiteur choisit avec le bouton **FR / EN** de la navigation ou la palette `Ctrl + K`. Son choix est mémorisé, et l'adresse `?lang=en` ouvre directement la version anglaise (à partager avec un recruteur anglophone).
+
+- **Contenu** (`src/data/`) : un texte traduisible s'écrit `{ fr: '…', en: '…' }`. Une simple chaîne (`'React'`, un nom propre) est identique dans les deux langues. Si l'anglais manque, le français s'affiche.
+  ```js
+  tagline: { fr: 'Gestion financière pour les PME', en: 'Financial management for small businesses' },
+  ```
+- **Interface** (boutons, titres de section, messages du formulaire…) : `src/i18n/ui.js`.
+- **CV en anglais** : déposez le PDF dans `public/cv/` et renseignez `cv.pathEn` dans `profile.js`. En attendant, la version anglaise propose le CV français avec la mention « Resume (French) ».
+
 | Fichier | Contenu |
 |---|---|
 | `profile.js` | Nom, textes de l'accueil et de « À propos », contact, réseaux, CV, expériences, formation, services, navigation |
@@ -88,6 +99,7 @@ src/
 ├── sections/      Hero, About, Skills, Projects, Creations, Journey, Services, Contact, Footer
 ├── components/    Navbar, Section, SectionHeading, Button, CvButton, ProjectCard,
 │                  CreationCard, Lightbox, BeforeAfter
+├── i18n/          LanguageContext (langue, tr()), ui.js (textes de l’interface FR / EN)
 ├── animations/    gsapAnimations.js : révélations au scroll (IntersectionObserver + GSAP)
 ├── hooks/         useGsap (gsap.context nettoyé au démontage), useCvAvailable
 └── App.jsx · main.jsx · index.css

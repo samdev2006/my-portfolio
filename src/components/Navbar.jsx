@@ -3,6 +3,8 @@ import { Menu, X, ArrowUpRight, Search } from 'lucide-react';
 import { navLinks, profile } from '../data/profile.js';
 import CvButton from './CvButton.jsx';
 import { openCommandPalette } from './CommandPalette.jsx';
+import LanguageSwitch from './LanguageSwitch.jsx';
+import { useLang } from '../i18n/LanguageContext.jsx';
 
 const SHORTCUT = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘ K' : 'Ctrl K';
 
@@ -14,6 +16,7 @@ export default function Navbar() {
   const menuRef = useRef(null);
   const toggleRef = useRef(null);
   const progressRef = useRef(null);
+  const { ui, tr } = useLang();
 
   useEffect(() => {
     const onScroll = () => {
@@ -79,7 +82,7 @@ export default function Navbar() {
           scrolled || open ? 'border-b border-line bg-ink/80 backdrop-blur-xl' : 'border-b border-transparent'
         }`}
       >
-        <nav aria-label="Navigation principale" className="page-x flex h-16 items-center justify-between gap-6 sm:h-[4.5rem]">
+        <nav aria-label={ui.nav.main} className="page-x flex h-16 items-center justify-between gap-6 sm:h-[4.5rem]">
           <a href="#accueil" className="group flex items-center gap-3" onClick={() => setOpen(false)}>
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-paper font-display text-sm font-bold tracking-tight text-ink transition-colors group-hover:bg-accent">
               {profile.logoText}
@@ -99,7 +102,7 @@ export default function Navbar() {
                     active === link.id ? 'bg-graphite text-paper' : 'text-stone hover:text-paper'
                   }`}
                 >
-                  {link.label}
+                  {tr(link.label)}
                 </a>
               </li>
             ))}
@@ -109,13 +112,14 @@ export default function Navbar() {
             <button
               type="button"
               onClick={openCommandPalette}
-              aria-label="Ouvrir la palette de commandes (Ctrl+K)"
+              aria-label={ui.nav.searchLabel}
               className="hidden h-9 items-center gap-2 rounded-full border border-line bg-coal/60 pl-3 pr-2 text-[0.8rem] text-stone transition-colors hover:border-paper/30 hover:text-paper lg:inline-flex"
             >
               <Search className="h-3.5 w-3.5" aria-hidden="true" />
-              Rechercher
+              {ui.nav.search}
               <kbd className="rounded-md border border-line bg-graphite px-1.5 font-mono text-[0.65rem]">{SHORTCUT}</kbd>
             </button>
+            <LanguageSwitch />
             <CvButton size="sm" label="CV" className="hidden sm:inline-flex" />
             <button
               ref={toggleRef}
@@ -123,7 +127,7 @@ export default function Navbar() {
               onClick={() => setOpen((value) => !value)}
               aria-expanded={open}
               aria-controls="mobile-menu"
-              aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+              aria-label={open ? ui.nav.closeMenu : ui.nav.openMenu}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-coal text-paper md:hidden"
             >
               {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
@@ -149,7 +153,7 @@ export default function Navbar() {
                   onClick={() => setOpen(false)}
                   className="flex items-center justify-between py-5 font-display text-3xl font-semibold tracking-tight"
                 >
-                  {link.label}
+                  {tr(link.label)}
                   <span className="font-mono text-xs text-stone">0{i + 1}</span>
                 </a>
               </li>

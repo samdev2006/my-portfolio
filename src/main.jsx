@@ -4,10 +4,13 @@ import '@fontsource-variable/bricolage-grotesque';
 import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 import App from './App.jsx';
+import { LanguageProvider } from './i18n/LanguageContext.jsx';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
   </React.StrictMode>
 );

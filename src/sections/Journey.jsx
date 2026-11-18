@@ -2,6 +2,7 @@ import { Briefcase, GraduationCap } from 'lucide-react';
 import { profile } from '../data/profile.js';
 import Section from '../components/Section.jsx';
 import SectionHeading from '../components/SectionHeading.jsx';
+import { useLang } from '../i18n/LanguageContext.jsx';
 
 function Column({ icon: Icon, title, children }) {
   return (
@@ -47,38 +48,39 @@ function Entry({ period, title, place, meta, text, tags = [], current = false })
 
 export default function Journey() {
   const { experiences, education } = profile;
+  const { tr, ui } = useLang();
 
   return (
     <Section id="parcours" className="border-t border-line">
-      <SectionHeading id="parcours" index="06" label="Parcours" title="Une trajectoire, étape par étape." />
+      <SectionHeading id="parcours" index="06" label={ui.journey.label} title={ui.journey.title} />
 
       <div className="grid gap-16 lg:grid-cols-2 lg:gap-14">
-        <Column icon={Briefcase} title="Expérience">
+        <Column icon={Briefcase} title={ui.journey.experience}>
           {experiences.map((exp, i) => (
             <Entry
-              key={`${exp.organization}-${exp.period}`}
-              period={exp.period}
-              title={exp.role}
-              place={`${exp.organization}${exp.type ? ` · ${exp.type}` : ''}`}
-              text={exp.description}
+              key={`${exp.organization}-${i}`}
+              period={tr(exp.period)}
+              title={tr(exp.role)}
+              place={`${exp.organization}${exp.type ? ` · ${tr(exp.type)}` : ''}`}
+              text={tr(exp.description)}
               tags={exp.stack}
-              current={i === 0 && /depuis/i.test(exp.period)}
+              current={Boolean(exp.current)}
             />
           ))}
           {experiences.length === 0 && (
-            <li className="py-7 text-sm text-stone">À la recherche d’un stage pour rejoindre une équipe technique.</li>
+            <li className="py-7 text-sm text-stone">{ui.journey.noExperience}</li>
           )}
         </Column>
 
-        <Column icon={GraduationCap} title="Formation">
-          {education.map((edu) => (
+        <Column icon={GraduationCap} title={ui.journey.education}>
+          {education.map((edu, i) => (
             <Entry
-              key={`${edu.degree}-${edu.period}`}
-              period={edu.period}
-              title={edu.degree}
-              place={edu.school}
-              meta={edu.location}
-              text={edu.description}
+              key={i}
+              period={tr(edu.period)}
+              title={tr(edu.degree)}
+              place={tr(edu.school)}
+              meta={tr(edu.location)}
+              text={tr(edu.description)}
             />
           ))}
         </Column>

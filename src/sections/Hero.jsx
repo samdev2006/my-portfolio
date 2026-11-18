@@ -6,10 +6,12 @@ import { profile } from '../data/profile.js';
 import { marqueeStack } from '../data/skills.js';
 import Button from '../components/Button.jsx';
 import CvButton from '../components/CvButton.jsx';
+import { useLang } from '../i18n/LanguageContext.jsx';
 
 function LocalTime() {
+  const { lang } = useLang();
   const format = () =>
-    new Intl.DateTimeFormat('fr-FR', {
+    new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'fr-FR', {
       hour: '2-digit',
       minute: '2-digit',
       timeZone: profile.contact.timeZone,
@@ -17,16 +19,18 @@ function LocalTime() {
   const [time, setTime] = useState(format);
 
   useEffect(() => {
+    setTime(format());
     const id = window.setInterval(() => setTime(format()), 30_000);
     return () => window.clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [lang]);
 
   return <span className="tabular-nums">{time}</span>;
 }
 
 // Petite fenêtre d'éditeur : une présentation « en Java », construite à partir des données réelles.
 function CodeCard() {
+  const { tr, ui, lang } = useLang();
   const current = profile.experiences[0];
   const k = (text) => <span className="text-[#C792EA]">{text}</span>; // mots-clés
   const t = (text) => <span className="text-[#FFCB6B]">{text}</span>; // types
@@ -52,18 +56,18 @@ function CodeCard() {
     <>
       {k('public class')} {c('Samuel')} {k('extends')} {c('Developer')} {'{'}
     </>,
-    field(t('String'), 'role', s(profile.title)),
+    field(t('String'), 'role', s(tr(profile.title))),
     field(t('String'), 'city', s('Abidjan, CI')),
-    current ? field(t('String'), 'current', s(`${current.type} @ ${current.organization}`)) : null,
+    current ? field(t('String'), 'current', s(`${tr(current.type)} @ ${current.organization}`)) : null,
     field(<>{t('String')}[]</>, 'stack', <>{'{'}{list(['React', 'Spring Boot', 'Flutter'])}{'}'}</>),
-    field(<>{t('String')}[]</>, 'design', <>{'{'}{list(['Affiches', 'Vidéo'])}{'}'}</>),
+    field(<>{t('String')}[]</>, 'design', <>{'{'}{list(lang === 'en' ? ['Posters', 'Video'] : ['Affiches', 'Vidéo'])}{'}'}</>),
     field(k('boolean'), 'available', b(String(profile.availability.open))),
     <>{'}'}</>,
   ].filter(Boolean);
 
   return (
     <figure
-      aria-label="Présentation résumée sous forme de code"
+      aria-label={ui.hero.codeLabel}
       className="relative overflow-hidden rounded-3xl border border-line bg-coal/90 shadow-[0_40px_120px_-40px_rgba(255,107,26,0.35)] backdrop-blur"
     >
       <div className="flex items-center gap-2 border-b border-line px-5 py-3.5">
@@ -87,6 +91,8 @@ function CodeCard() {
 }
 
 export default function Hero() {
+  const { tr, ui } = useLang();
+  const current = profile.experiences[0];
   const ref = useGsap(({ reduced }) => {
     if (reduced) return;
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.1 });
@@ -140,9 +146,9 @@ export default function Hero() {
               <span className="absolute inline-flex h-full w-full animate-ping2 rounded-full bg-[#28C840]" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[#28C840]" />
             </span>
-            {profile.availability.label}
-            {profile.experiences[0] && (
-              <span className="hidden text-stone sm:inline">· Stagiaire chez {profile.experiences[0].organization}</span>
+            {tr(profile.availability.label)}
+            {current && current.current && (
+              <span className="hidden text-stone sm:inline">· {ui.hero.internAt(current.organization)}</span>
             )}
           </p>
 
@@ -151,7 +157,7 @@ export default function Hero() {
             className="mt-8 text-[clamp(3rem,8vw,7.2rem)] font-semibold leading-[0.92] tracking-[-0.045em]"
           >
             <span className="sr-only">
-              {profile.fullName}, {profile.title}
+              {profile.fullName}, {tr(profile.title)}
             </span>
             <span aria-hidden="true">
               {profile.heroLines.map((line, i) => (
@@ -166,16 +172,16 @@ export default function Hero() {
           </h1>
 
           <p data-hero-fade className="mt-8 font-display text-xl font-medium tracking-tight text-paper sm:text-2xl">
-            {profile.title} <span className="text-stone">— {profile.tagline}</span>
+            {tr(profile.title)} <span className="text-stone">— {tr(profile.tagline)}</span>
           </p>
 
           <p data-hero-fade className="mt-5 max-w-xl text-base leading-relaxed text-stone sm:text-[1.05rem]">
-            {profile.heroDescription}
+            {tr(profile.heroDescription)}
           </p>
 
           <div data-hero-fade className="mt-10 flex flex-wrap items-center gap-3">
             <Button href="#projets" iconRight={ArrowRight} variant="light">
-              Voir mes projets
+              {ui.hero.viewProjects}
             </Button>
             <CvButton />
           </div>
@@ -189,7 +195,7 @@ export default function Hero() {
               <div aria-hidden="true" className="absolute left-1/2 top-[3%] aspect-square w-[92%] -translate-x-1/2 rounded-full border border-paper/10 bg-gradient-to-b from-paper/[0.06] to-transparent" />
               <img
                 src={profile.photo.src}
-                alt={profile.photo.alt}
+                alt={tr(profile.photo.alt)}
                 width="633"
                 height="800"
                 fetchpriority="high"
@@ -214,10 +220,10 @@ export default function Hero() {
         <div className="page-x flex flex-wrap items-center justify-between gap-x-8 gap-y-2 py-4 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-stone">
           <span className="inline-flex items-center gap-2">
             <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-            {profile.contact.location} · <LocalTime /> GMT
+            {tr(profile.contact.location)} · <LocalTime /> GMT
           </span>
           <a href="#apropos" className="hidden items-center gap-2 transition-colors hover:text-paper sm:inline-flex">
-            Défiler
+            {ui.hero.scroll}
             <ArrowDown className="h-3.5 w-3.5" aria-hidden="true" />
           </a>
         </div>

@@ -1,22 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDownToLine, ArrowRight, Copy, CornerDownLeft, Github, Hash, Linkedin, Mail, Search } from 'lucide-react';
+import { ArrowDownToLine, ArrowRight, Copy, CornerDownLeft, Github, Hash, Languages, Linkedin, Mail, Search } from 'lucide-react';
 import { profile } from '../data/profile.js';
 import { copyText } from '../utils/clipboard.js';
+import { useLang } from '../i18n/LanguageContext.jsx';
+import { cvFor } from './CvButton.jsx';
 
 /** Ouvre la palette depuis n'importe quel composant (ex. bouton de la navbar). */
 export const openCommandPalette = () => window.dispatchEvent(new Event('open-command-palette'));
 
-const SECTIONS = [
-  { id: 'accueil', label: 'Accueil' },
-  { id: 'apropos', label: 'À propos' },
-  { id: 'competences', label: 'Compétences' },
-  { id: 'projets', label: 'Projets' },
-  { id: 'github', label: 'Activité GitHub' },
-  { id: 'creations', label: 'Créations' },
-  { id: 'parcours', label: 'Parcours' },
-  { id: 'services', label: 'Services' },
-  { id: 'contact', label: 'Contact' },
-];
+const SECTIONS = ['accueil', 'apropos', 'competences', 'projets', 'github', 'creations', 'parcours', 'services', 'contact'];
 
 const normalize = (text) =>
   text
@@ -26,6 +18,8 @@ const normalize = (text) =>
 
 /** Palette de commandes : Ctrl+K / ⌘K. Navigation entre sections et actions rapides. */
 export default function CommandPalette() {
+  const { lang, setLang, ui } = useLang();
+  const t = ui.palette;
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
@@ -39,34 +33,35 @@ export default function CommandPalette() {
   };
 
   const commands = useMemo(() => {
-    const { contact, socials, cv } = profile;
+    const { contact, socials } = profile;
+    const cv = cvFor(lang);
     const go = (id) => () => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     const openUrl = (url) => () => window.open(url, '_blank', 'noopener,noreferrer');
     return [
-      ...SECTIONS.filter((s) => s.id === 'accueil' || document.getElementById(s.id)).map((s) => ({
-        id: `go-${s.id}`,
-        group: 'Aller à',
-        label: s.label,
+      ...SECTIONS.filter((id) => document.getElementById(id)).map((id) => ({
+        id: `go-${id}`,
+        group: t.groups.go,
+        label: t.sections[id],
         icon: Hash,
-        run: go(s.id),
+        run: go(id),
       })),
       {
         id: 'copy-email',
-        group: 'Actions',
-        label: 'Copier mon adresse e-mail',
+        group: t.groups.actions,
+        label: t.copyEmail,
         hint: contact.email,
         icon: Copy,
         run: async () => {
           await copyText(contact.email);
-          notify('Adresse e-mail copiée');
+          notify(t.copied);
         },
       },
-      { id: 'mail', group: 'Actions', label: 'M’écrire un e-mail', icon: Mail, run: () => (window.location.href = `mailto:${contact.email}`) },
+      { id: 'mail', group: t.groups.actions, label: t.writeEmail, icon: Mail, run: () => (window.location.href = `mailto:${contact.email}`) },
       {
         id: 'cv',
-        group: 'Actions',
-        label: 'Télécharger mon CV',
-        hint: 'PDF',
+        group: t.groups.actions,
+        label: t.cv,
+        hint: cv.frenchOnly ? 'PDF · FR' : 'PDF',
         icon: ArrowDownToLine,
         run: () => {
           const link = document.createElement('a');
@@ -75,12 +70,20 @@ export default function CommandPalette() {
           link.click();
         },
       },
-      socials.github && { id: 'github', group: 'Liens', label: 'Ouvrir mon GitHub', icon: Github, run: openUrl(socials.github) },
-      socials.linkedin && { id: 'linkedin', group: 'Liens', label: 'Ouvrir mon LinkedIn', icon: Linkedin, run: openUrl(socials.linkedin) },
+      {
+        id: 'lang',
+        group: t.groups.actions,
+        label: lang === 'fr' ? t.english : t.french,
+        hint: lang === 'fr' ? 'EN' : 'FR',
+        icon: Languages,
+        run: () => setLang(lang === 'fr' ? 'en' : 'fr'),
+      },
+      socials.github && { id: 'github', group: t.groups.links, label: t.github, icon: Github, run: openUrl(socials.github) },
+      socials.linkedin && { id: 'linkedin', group: t.groups.links, label: t.linkedin, icon: Linkedin, run: openUrl(socials.linkedin) },
     ].filter(Boolean);
-    // Recalculé à chaque ouverture : les sections présentes peuvent varier.
+    // Recalculé à l'ouverture et au changement de langue.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, lang]);
 
   const results = useMemo(() => {
     const q = normalize(query.trim());
@@ -161,7 +164,7 @@ export default function CommandPalette() {
           className="fixed inset-0 z-[90] flex items-start justify-center bg-ink/70 px-4 pt-[14vh] backdrop-blur-sm"
           onMouseDown={(event) => event.target === event.currentTarget && setOpen(false)}
         >
-          <div role="dialog" aria-modal="true" aria-label="Palette de commandes" className="w-full max-w-xl overflow-hidden rounded-2xl border border-line bg-coal shadow-[0_40px_120px_-20px_rgba(0,0,0,0.9)]">
+          <div role="dialog" aria-modal="true" aria-label={t.label} className="w-full max-w-xl overflow-hidden rounded-2xl border border-line bg-coal shadow-[0_40px_120px_-20px_rgba(0,0,0,0.9)]">
             <div className="flex items-center gap-3 border-b border-line px-4">
               <Search className="h-4 w-4 shrink-0 text-stone" aria-hidden="true" />
               <input
@@ -169,18 +172,18 @@ export default function CommandPalette() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={onKeyDown}
-                placeholder="Rechercher une section ou une action…"
+                placeholder={t.placeholder}
                 role="combobox"
                 aria-expanded="true"
                 aria-controls="palette-list"
                 aria-activedescendant={results[active] ? `palette-${results[active].id}` : undefined}
                 className="h-14 w-full bg-transparent text-[0.95rem] text-paper placeholder:text-paper/35 focus:outline-none"
               />
-              <kbd className="rounded-md border border-line px-1.5 py-0.5 font-mono text-[0.65rem] text-stone">Échap</kbd>
+              <kbd className="rounded-md border border-line px-1.5 py-0.5 font-mono text-[0.65rem] text-stone">{t.escape}</kbd>
             </div>
 
-            <ul id="palette-list" ref={listRef} role="listbox" aria-label="Commandes" className="max-h-[52vh] overflow-y-auto p-2">
-              {results.length === 0 && <li className="px-3 py-8 text-center text-sm text-stone">Aucun résultat pour « {query} ».</li>}
+            <ul id="palette-list" ref={listRef} role="listbox" aria-label={t.commands} className="max-h-[52vh] overflow-y-auto p-2">
+              {results.length === 0 && <li className="px-3 py-8 text-center text-sm text-stone">{t.noResult(query)}</li>}
               {results.map((command, index) => {
                 const showGroup = command.group !== lastGroup;
                 lastGroup = command.group;
@@ -213,10 +216,10 @@ export default function CommandPalette() {
             <div className="flex items-center gap-4 border-t border-line px-4 py-2.5 font-mono text-[0.65rem] text-stone">
               <span className="inline-flex items-center gap-1.5">
                 <kbd className="rounded border border-line px-1">↑</kbd>
-                <kbd className="rounded border border-line px-1">↓</kbd> naviguer
+                <kbd className="rounded border border-line px-1">↓</kbd> {t.navigate}
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <kbd className="rounded border border-line px-1">↵</kbd> ouvrir
+                <kbd className="rounded border border-line px-1">↵</kbd> {t.open}
               </span>
               <span className="ml-auto inline-flex items-center gap-1">
                 <ArrowRight className="h-3 w-3" aria-hidden="true" /> Ctrl / ⌘ + K

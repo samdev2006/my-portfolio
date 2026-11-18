@@ -2,10 +2,14 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { gsap } from '../animations/gsapAnimations.js';
 import BeforeAfter from './BeforeAfter.jsx';
+import { useLang } from '../i18n/LanguageContext.jsx';
 
 /** Visionneuse plein écran : image, vidéo locale, vidéo YouTube ou comparateur avant / après. */
 export default function Lightbox({ item, categoryLabel, position, hasPrev, hasNext, onClose, onPrev, onNext }) {
   const rootRef = useRef(null);
+  const { tr, ui } = useLang();
+  const title = tr(item.title);
+  const description = tr(item.description);
   const mediaRef = useRef(null);
   const closeRef = useRef(null);
   // Les derniers callbacks, lus par l'écouteur clavier installé une seule fois.
@@ -60,7 +64,7 @@ export default function Lightbox({ item, categoryLabel, position, hasPrev, hasNe
     media = (
       <div className="aspect-video w-full max-w-5xl overflow-hidden rounded-2xl bg-black">
         <iframe
-          title={item.title}
+          title={title}
           src={`https://www.youtube-nocookie.com/embed/${item.youtube}?rel=0`}
           allow="accelerometer; encrypted-media; picture-in-picture; fullscreen"
           allowFullScreen
@@ -79,13 +83,13 @@ export default function Lightbox({ item, categoryLabel, position, hasPrev, hasNe
         preload="metadata"
         className="max-h-[72vh] w-full max-w-5xl rounded-2xl bg-black"
       >
-        Votre navigateur ne peut pas lire cette vidéo.
+        {ui.creations.noVideo}
       </video>
     );
   } else if (item.before) {
-    media = <BeforeAfter before={item.before} after={item.src} alt={item.title} />;
+    media = <BeforeAfter before={item.before} after={item.src} alt={title} />;
   } else {
-    media = <img src={item.src} alt={item.title} className="max-h-[72vh] w-auto max-w-full rounded-2xl object-contain" />;
+    media = <img src={item.src} alt={title} className="max-h-[72vh] w-auto max-w-full rounded-2xl object-contain" />;
   }
 
   const navButton =
@@ -96,13 +100,13 @@ export default function Lightbox({ item, categoryLabel, position, hasPrev, hasNe
       ref={rootRef}
       role="dialog"
       aria-modal="true"
-      aria-label={item.title}
+      aria-label={title}
       onClick={onClose}
       className="fixed inset-0 z-[95] flex flex-col bg-ink/95 backdrop-blur-md"
     >
       <div className="flex items-center justify-between px-4 py-4 sm:px-8">
         <span className="font-mono text-xs text-stone">{position}</span>
-        <button ref={closeRef} type="button" onClick={onClose} aria-label="Fermer la visionneuse" className={navButton}>
+        <button ref={closeRef} type="button" onClick={onClose} aria-label={ui.creations.close} className={navButton}>
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
       </div>
@@ -126,14 +130,14 @@ export default function Lightbox({ item, categoryLabel, position, hasPrev, hasNe
             {item.year ? `${item.year} · ` : ''}
             {categoryLabel}
           </p>
-          <h3 className="mt-1 truncate text-xl font-semibold tracking-tight">{item.title}</h3>
-          {item.description && <p className="mt-1 text-sm text-stone">{item.description}</p>}
+          <h3 className="mt-1 truncate text-xl font-semibold tracking-tight">{title}</h3>
+          {description && <p className="mt-1 text-sm text-stone">{description}</p>}
         </div>
         <div className="flex shrink-0 gap-2">
-          <button type="button" onClick={onPrev} disabled={!hasPrev} aria-label="Réalisation précédente" className={`${navButton} disabled:opacity-30`}>
+          <button type="button" onClick={onPrev} disabled={!hasPrev} aria-label={ui.creations.prev} className={`${navButton} disabled:opacity-30`}>
             <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </button>
-          <button type="button" onClick={onNext} disabled={!hasNext} aria-label="Réalisation suivante" className={`${navButton} disabled:opacity-30`}>
+          <button type="button" onClick={onNext} disabled={!hasNext} aria-label={ui.creations.next} className={`${navButton} disabled:opacity-30`}>
             <ChevronRight className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>

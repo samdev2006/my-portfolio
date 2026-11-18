@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import { Play, ArrowLeftRight, Maximize2 } from 'lucide-react';
 import { gsap } from '../animations/gsapAnimations.js';
+import { useLang } from '../i18n/LanguageContext.jsx';
 
 export const isEmptyCreation = (item) => !item.src && !item.youtube;
 
@@ -9,6 +10,9 @@ const youtubeThumb = (id) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 /** Vignette de la galerie (format d'origine de l'image). `animate` : entrée animée après un changement de filtre. */
 export default function CreationCard({ item, index, animate, categoryLabel, onOpen }) {
   const ref = useRef(null);
+  const { tr, ui } = useLang();
+  const title = tr(item.title);
+  const description = tr(item.description);
   const isVideo = item.type === 'video' || Boolean(item.youtube);
   const hasCompare = Boolean(item.before && item.src);
   const cover = item.poster || (item.youtube ? youtubeThumb(item.youtube) : !isVideo ? item.src : '');
@@ -31,13 +35,13 @@ export default function CreationCard({ item, index, animate, categoryLabel, onOp
       <button
         type="button"
         onClick={() => onOpen(item)}
-        aria-label={`Agrandir : ${item.title}`}
+        aria-label={ui.creations.enlarge(title)}
         className="group relative block w-full overflow-hidden rounded-2xl border border-line bg-coal text-left"
       >
         {cover ? (
           <img
             src={cover}
-            alt={item.description ? `${item.title} — ${item.description}` : item.title}
+            alt={description ? `${title} — ${description}` : title}
             loading="lazy"
             decoding="async"
             className={`block w-full transition-transform duration-700 ease-out group-hover:scale-[1.03] ${isVideo ? 'aspect-video object-cover' : 'h-auto'}`}
@@ -56,7 +60,7 @@ export default function CreationCard({ item, index, animate, categoryLabel, onOp
         {hasCompare && (
           <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/80 px-3 py-1 font-mono text-[0.62rem] uppercase tracking-widest text-paper backdrop-blur">
             <ArrowLeftRight className="h-3.5 w-3.5" aria-hidden="true" />
-            Avant / après
+            {ui.creations.beforeAfter}
           </span>
         )}
 
@@ -69,7 +73,7 @@ export default function CreationCard({ item, index, animate, categoryLabel, onOp
             {item.year ? `${item.year} · ` : ''}
             {categoryLabel}
           </span>
-          <span className="mt-1 block font-display text-lg font-semibold tracking-tight text-paper">{item.title}</span>
+          <span className="mt-1 block font-display text-lg font-semibold tracking-tight text-paper">{title}</span>
         </span>
       </button>
     </li>
